@@ -12,15 +12,11 @@ export const Login: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-
-  // Получаем данные из Redux
   const user = useSelector(selectUser);
   const error = useSelector(selectError);
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Проверка: если пользователь уже авторизован → перенаправляем
   useEffect(() => {
     if (user) {
       const from = location.state?.from || '/';
@@ -30,10 +26,9 @@ export const Login: FC = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-
-    // Диспатчим вход
     dispatch(login({ email, password }));
   };
+
   return (
     <LoginUI
       errorText=''

@@ -14,14 +14,15 @@ export const OrderInfoUI: FC<OrderInfoUIProps> = memo(({ orderInfo }) => (
     <h1 className={`text text_type_digits-default mb-10 ${styles.number}`}>
       #{orderInfo.number}
     </h1>
-
     <h3 className={`text text_type_main-medium pb-3 pt-10 ${styles.header}`}>
       {orderInfo.name}
     </h3>
-    <OrderStatus status={orderInfo.status} />
+    <div className='pb-15'>
+      <OrderStatus status={orderInfo.status} />
+    </div>
     <p className={`text text_type_main-medium pt-15 pb-6`}>Состав:</p>
     <ul className={`${styles.list} mb-8`}>
-      {Object.values(orderInfo.ingredientsInfo).map((item: any, index) => (
+      {Object.values(orderInfo.ingredientsInfo).map((item, index) => (
         <li className={`pb-4 pr-6 ${styles.item}`} key={index}>
           <div className={styles.img_wrap}>
             <div className={styles.border}>

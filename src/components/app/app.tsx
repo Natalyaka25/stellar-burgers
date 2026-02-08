@@ -11,7 +11,6 @@ import {
 } from '@pages';
 import '../../index.css';
 import styles from './app.module.css';
-
 import {
   AppHeader,
   IngredientDetails,
@@ -24,7 +23,8 @@ import {
   Routes,
   Route,
   useLocation,
-  useNavigate
+  useNavigate,
+  matchPath
 } from 'react-router-dom';
 import { FC, useEffect } from 'react';
 import { ProviderComponent } from '../../services';
@@ -51,7 +51,18 @@ const RouteComponent: FC = () => {
   const background = location.state?.background;
   const dispatch = useDispatch();
 
-  // Проверка авторизации пользователя
+  const isModalRoute = [
+    '/ingredients/:id',
+    '/feed/:number',
+    '/profile/orders/:number'
+  ].some((route) => matchPath(route, location.pathname));
+
+  useEffect(() => {
+    dispatch(fetchIngredients())
+      .unwrap()
+      .catch(() => {});
+  }, [dispatch]);
+
   useEffect(() => {
     const refreshToken = localStorage.getItem('refreshToken');
     if (refreshToken) {
@@ -63,16 +74,6 @@ const RouteComponent: FC = () => {
     }
   }, [dispatch]);
 
-  // Загрузка списка ингредиентов
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      dispatch(fetchIngredients())
-        .unwrap()
-        .catch(() => {});
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [dispatch]);
-
   const handleModalClose = () => {
     navigate(-1);
   };
@@ -82,7 +83,21 @@ const RouteComponent: FC = () => {
       <Routes location={background || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
-        <Route path='/feed/:number' element={<OrderInfo />} />
+
+        {!background && isModalRoute && (
+          <>
+            <Route path='/feed/:number' element={<OrderInfo />} />
+            <Route path='/ingredients/:id' element={<IngredientDetails />} />
+            <Route
+              path='/profile/orders/:number'
+              element={
+                <ProtectedRoute>
+                  <OrderInfo />
+                </ProtectedRoute>
+              }
+            />
+          </>
+        )}
 
         <Route
           path='/login'
@@ -116,7 +131,6 @@ const RouteComponent: FC = () => {
             </ProtectedRoute>
           }
         />
-
         <Route
           path='/profile'
           element={
@@ -133,20 +147,9 @@ const RouteComponent: FC = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path='/profile/orders/:number'
-          element={
-            <ProtectedRoute>
-              <OrderInfo />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route path='/ingredients/:id' element={<IngredientDetails />} />
         <Route path='/*' element={<NotFound404 />} />
       </Routes>
 
-      {/* Модальные окна для фоновых роутов */}
       {background && (
         <Routes>
           <Route

@@ -4,7 +4,7 @@ import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { useDispatch, useSelector } from '../../services/store';
 import { fetchOrderByNumber } from '../../services/slices/orderSlice';
-import { fetchIngredients } from '../../services/slices/ingredientsSlice';
+import { TIngredient } from '@utils-types';
 
 export const OrderInfo: FC = () => {
   const { number } = useParams<{ number: string }>();
@@ -33,30 +33,29 @@ export const OrderInfo: FC = () => {
     }
   }, [number, orderData, orderLoading, dispatch]);
 
-  useEffect(() => {
-    if (ingredients.length === 0 && !ingredientsLoading) {
-      dispatch(fetchIngredients());
-    }
-  }, [dispatch, ingredients.length, ingredientsLoading]);
-
   const orderInfo = useMemo(() => {
-    if (!orderData || !ingredients.length) return null;
+    if (!orderData || ingredientsLoading) return null;
+
+    if (ingredients.length === 0) return null;
 
     const ingredientsInfo = orderData.ingredients.reduce(
       (acc, itemId) => {
-        if (!acc[itemId]) {
-          const ingredient = ingredients.find((ing) => ing._id === itemId);
-          ingredient && (acc[itemId] = { ...ingredient, count: 1 });
-        } else {
-          acc[itemId].count++;
+        const ingredient = ingredients.find((ing) => ing._id === itemId);
+
+        if (ingredient) {
+          if (!acc[itemId]) {
+            acc[itemId] = { ...ingredient, count: 1 };
+          } else {
+            acc[itemId].count++;
+          }
         }
         return acc;
       },
-      {} as Record<string, any>
+      {} as Record<string, TIngredient & { count: number }>
     );
 
     const total = Object.values(ingredientsInfo).reduce(
-      (acc: number, item: any) => acc + item.price * item.count,
+      (acc, item) => acc + item.price * item.count,
       0
     );
 
@@ -66,11 +65,15 @@ export const OrderInfo: FC = () => {
       date: new Date(orderData.createdAt),
       total
     };
-  }, [orderData, ingredients]);
+  }, [orderData, ingredients, ingredientsLoading]);
 
-  if (orderLoading || ingredientsLoading || !orderInfo) {
+  if (orderLoading || ingredientsLoading) {
     return <Preloader />;
   }
 
-  return <OrderInfoUI orderInfo={orderInfo} />;
+  if (!orderInfo && !ingredientsLoading) {
+    return <div>Заказ не найден</div>;
+  }
+
+  return <OrderInfoUI orderInfo={orderInfo!} />;
 };

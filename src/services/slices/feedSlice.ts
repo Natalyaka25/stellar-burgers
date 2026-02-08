@@ -24,8 +24,12 @@ export const getFeeds = createAsyncThunk(
     try {
       const response = await getFeedsApi();
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка загрузки ленты заказов');
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Ошибка загрузки ленты заказов';
+      return rejectWithValue(message);
     }
   }
 );
@@ -44,7 +48,6 @@ const feedSlice = createSlice({
       })
       .addCase(getFeeds.fulfilled, (state, action) => {
         state.loading = false;
-
         if (action.payload.success) {
           state.orders = action.payload.orders || [];
           state.total = action.payload.total || 0;

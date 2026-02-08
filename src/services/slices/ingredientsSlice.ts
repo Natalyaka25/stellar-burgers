@@ -1,4 +1,3 @@
-// services/slices/ingredientsSlice.ts
 import { getIngredientsApi } from '@api';
 import {
   createSlice,
@@ -25,8 +24,10 @@ export const fetchIngredients = createAsyncThunk(
     try {
       const ingredients = await getIngredientsApi();
       return ingredients;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка загрузки ингредиентов');
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Ошибка загрузки ингредиентов';
+      return rejectWithValue(message);
     }
   }
 );
@@ -38,13 +39,11 @@ const ingredientsSlice = createSlice({
   selectors: {
     selectIngredientsLoading: (state) => state.loading,
     selectIngredients: (state) => state.items,
-
     selectIngredientById: createSelector(
       [(state: IngredientsState) => state.items, (state, id: string) => id],
       (items: TIngredient[], id: string) =>
         items.find((item: TIngredient) => item._id === id)
     ),
-
     selectBuns: createSelector(
       [(state: IngredientsState) => state.items],
       (items: TIngredient[]) =>

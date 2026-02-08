@@ -64,7 +64,7 @@ const constructorSlice = createSlice({
         state.ingredients[index + 1] = temp;
       }
     },
-    // Очистка конструктора после создания заказа
+
     resetConstructor: (state) => {
       state.bun = null;
       state.ingredients = [];

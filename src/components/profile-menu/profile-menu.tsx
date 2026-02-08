@@ -10,7 +10,6 @@ export const ProfileMenu: FC = () => {
   const dispatch = useDispatch();
 
   const handleLogout = () => {
-    // Очистка данных пользователя и перенаправление на страницу входа
     dispatch(logout());
     navigate('/login');
   };

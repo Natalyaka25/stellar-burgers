@@ -28,7 +28,6 @@ const ProtectedRoute: FC<IProtectedRouteProps> = ({
     return <Navigate to={from} replace />;
   }
 
-  // Защита маршрутов, требующих авторизации
   if (!onlyUnAuth && !user) {
     return <Navigate to='/login' state={{ from: location }} replace />;
   }

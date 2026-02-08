@@ -20,7 +20,6 @@ export const Register: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Проверка: если пользователь уже авторизован → перенаправляем
   useEffect(() => {
     if (user) {
       const from = location.state?.from || '/';
@@ -31,7 +30,6 @@ export const Register: FC = () => {
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
 
-    // Диспатчим регистрацию
     dispatch(register({ name: userName, email, password }));
   };
 

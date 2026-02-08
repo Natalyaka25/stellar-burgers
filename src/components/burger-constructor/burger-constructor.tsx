@@ -22,6 +22,12 @@ export const BurgerConstructor: FC = React.memo(() => {
   const constructorItems = useSelector(getConstructorItems);
   const { orderData, request: orderStateRequest } = useSelector(getOrderState);
 
+  useEffect(() => {
+    if (orderData && orderData.success) {
+      dispatch(resetConstructor());
+    }
+  }, [orderData, dispatch]);
+
   const onOrderClick = useCallback(() => {
     if (!isAuthenticated) {
       navigate('/login', { state: { from: '/' } });
@@ -50,11 +56,7 @@ export const BurgerConstructor: FC = React.memo(() => {
 
   const closeOrderModal = useCallback(() => {
     dispatch(clearOrder());
-
-    if (orderData && orderData.success) {
-      dispatch(resetConstructor());
-    }
-  }, [dispatch, orderData]);
+  }, [dispatch]);
 
   const orderModalData = orderData?.order || null;
   const orderRequest = orderStateRequest;
