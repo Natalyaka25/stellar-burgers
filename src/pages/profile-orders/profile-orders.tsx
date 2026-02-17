@@ -4,14 +4,14 @@ import { Preloader } from '@ui';
 import { useDispatch, useSelector } from '../../services/store';
 import {
   fetchUserOrders,
+  selectUserOrders,
   selectOrderError,
   selectOrderLoading
 } from '../../services/slices/orderSlice';
-import { selectOrders } from '../../services/slices/feedSlice';
 
 export const ProfileOrders: FC = () => {
   const dispatch = useDispatch();
-  const orders = useSelector(selectOrders);
+  const orders = useSelector(selectUserOrders);
   const isLoading = useSelector(selectOrderLoading);
   const error = useSelector(selectOrderError);
 
