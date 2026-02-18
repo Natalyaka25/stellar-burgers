@@ -13,7 +13,7 @@ type TOrderApiResponse = {
 };
 
 type TOrderState = {
-  orders: TOrder[];
+  orders: TOrder[]; // заказы пользователя
   orderByNumberResponse: TOrder | null;
   request: boolean;
   responseOrder: null;
@@ -88,6 +88,7 @@ const orderSlice = createSlice({
   },
   selectors: {
     getOrderState: (state: TOrderState) => state,
+    selectUserOrders: (state: TOrderState) => state.orders, // НОВЫЙ СЕЛЕКТОР
     selectOrderById: createSelector(
       [
         (state: TOrderState) => state.orders,
@@ -129,22 +130,12 @@ const orderSlice = createSlice({
         state.request = false;
         state.error = null;
         if (action.payload && action.payload.length > 0) {
-          const existingOrders = state.orders || [];
-          const newOrders = action.payload || [];
-          const allOrders = [...existingOrders, ...newOrders].reduce(
-            (unique, order) => {
-              if (!unique.some((o) => o._id === order._id)) {
-                unique.push(order);
-              }
-              return unique;
-            },
-            [] as TOrder[]
-          );
-          allOrders.sort(
+          state.orders = [...action.payload].sort(
             (a, b) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
-          state.orders = allOrders.slice(0, 50);
+        } else {
+          state.orders = [];
         }
       })
       .addCase(fetchUserOrders.rejected, (state, action) => {
@@ -169,6 +160,7 @@ const orderSlice = createSlice({
 
 export const {
   getOrderState,
+  selectUserOrders,
   selectOrderById,
   selectOrderByNumber,
   selectOrderLoading,
